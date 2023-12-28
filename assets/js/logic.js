@@ -36,7 +36,7 @@ const questions = [
 let currentQuestionIndex = 0;
 let timer;
 let score = 0;
-let totalTime = 60;
+let timeLeft = 60;
 
 
 // start button click event
@@ -54,15 +54,44 @@ function startQuiz() {
   startTimer(); // Timer starts
 }
 
+// function to display a question
+function displayQuestion() {
+  const currentQuestion = questions[currentQuestionIndex];
 
+  document.getElementById("question-title").textContent = currentQuestion.question;
 
-// For each question:
-  // User clicks an answer
-  // Their choice is compared to the correct answer as stored in the question's object
-  // If correct, tell them
-  // If incorrect, tell them AND subtract time from the timer
-  // Optional: play a sound for correct or incorrect
-  // Either way, the question disappears after a few seconds and the next question appears
+  const choicesContainer = document.getElementById("choices");
+  choicesContainer.innerHTML = "";
+
+  currentQuestion.choices.forEach((choice) => {
+    const button = document.createElement("button");
+    button.textContent = choice;
+    button.addEventListener("click", checkAnswer);
+    choicesContainer.appendChild(button);
+  });
+}
+
+//function to compare the answer and store it in the question's object
+function checkAnswer(event) {
+  const selectedAnswer = event.target.textContent;
+  const currentQuestion = questions[currentQuestionIndex];
+
+  if (selectedAnswer === currentQuestion.correctAnswer) {
+    //correct
+    score += 10; //increase the score
+    } else {
+      //incorrect
+      timeLeft -= 10; //decrease time as penalty
+    }
+  
+    currentQuestionIndex++;
+
+  if (currentQuestionIndex < questions.length) {
+    displayQuestion(); //next question
+  } else {
+    endQuiz(); // end quiz
+  }
+}
 
 // After the last question:
   // Timer stops
