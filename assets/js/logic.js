@@ -38,16 +38,23 @@ let timer;
 let score = 0;
 let totalTime = 60;
 
-// Landing page:
-  // Explanation of the quiz
-  // Start button
+
+// start button click event
+document.getElementById("start").addEventListener("click", startQuiz);
+
+// submit button click event
+document.getElementById("submit").addEventListener("click", submitScore);
+
+// function to start the quiz
+function startQuiz() {
+  document.getElementById("start-screen").classList.add("hide");
+  document.getElementById("questions").classList.remove("hide");
+
+  displayQuestion(questions[currentQuestionIndex]); //first question appears
+  startTimer(); // Timer starts
+}
 
 
-
-// Click the start button:
-  // Landing page goes away
-  // Timer starts
-  // The first question appears (with its answers)
 
 // For each question:
   // User clicks an answer
