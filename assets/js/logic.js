@@ -45,12 +45,31 @@ document.getElementById("start").addEventListener("click", startQuiz);
 // submit button click event
 document.getElementById("submit").addEventListener("click", submitScore);
 
+// // call the function to shuffle the questions order
+// document.getElementById("start").addEventListener("click", () => {
+//   shuffleQuestions();
+//   startQuiz();
+// });
+
+// function to shuffle the questions order
+function shuffleQuestions() {
+  for (let i = questions.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [questions[i], questions[j]] = [questions[j], questions[i]];
+  }
+  return questions;
+}
+
+
 // function to start the quiz
 function startQuiz() {
   document.getElementById("start-screen").classList.add("hide");
+
+  shuffleQuestions(questions);
+
   document.getElementById("questions").classList.remove("hide");
 
-  displayQuestion(questions[currentQuestionIndex]); //first question appears
+  displayQuestion(); //first question appears
   startTimer(); // Timer starts
 }
 
@@ -78,10 +97,11 @@ function checkAnswer(event) {
 
   if (selectedAnswer === currentQuestion.correctAnswer) {
     //correct
-    score += 10; //increase the score
+    timeLeft += 10; //increase the score
+    
     } else {
-      //incorrect
-      timeLeft -= 10; //decrease time as penalty
+    //incorrect
+    timeLeft -= 10; //decrease time as penalty
     }
   
     currentQuestionIndex++;
@@ -93,11 +113,55 @@ function checkAnswer(event) {
   }
 }
 
-// After the last question:
-  // Timer stops
-  // Question disappears
-  // Form appears for user to enter their initials
-  // Display their score
+// function to start the timer
+function startTimer() {
+  timer = setInterval(function () {
+    timeLeft--;
+    document.getElementById("time").textContent = timeLeft;
+
+    if (timeLeft <= 0) {
+      endQuiz();
+    }
+  }, 1000);
+}
+
+// function to end the quiz
+function endQuiz() {
+  clearInterval(timer);
+
+  document.getElementById("questions").classList.add("hide");
+  document.getElementById("end-screen").classList.remove("hide");
+  document.getElementById("final-score").textContent = timeLeft;
+}
+
+// function to submit the score
+function submitScore() {
+  const initials = document.getElementById("initials").value;
+  const score = timeLeft;
+
+  // check if localStorage is supported
+  if (typeof Storage !== "undefined") {
+    // retrieve existing high scores or initialize an empty array
+    const highScores = JSON.parse(localStorage.getItem("highScores")) || [];
+
+    // add the current score to the array
+    highScores.push({ initials, score });
+
+    // sort the high scores in descending order
+    highScores.sort((a, b) => b.score - a.score);
+
+    // storage the updated high scores in localStorage
+    localStorage.setItem("highScores", JSON.stringify(highScores));
+  } else {
+    // if localStorage is not supported, warn the user
+    console.error("LocalStorage is not supported. Unable to save your high scores.");
+  }
+
+  // redirect to highscores page
+  window.location.href = "highscores.html";
+
+}
+
 
 // User submits form
   // Initials and score get stored in local storage
