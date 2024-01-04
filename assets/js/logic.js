@@ -1,8 +1,17 @@
-// Set of questions --> array of objects
-// Each question needs the following:
-  //! Question text
-  //! Set of answers
-  //! Which answer is correct
+document.addEventListener('DOMContentLoaded', () => {
+
+// DOM elements
+let questionsContainer = document.getElementById("questions");
+let questionTitle = document.getElementById("question-title");
+const choicesContainer = document.getElementById("choices");
+let startScreen = document.getElementById("start-screen");
+let endScreen = document.getElementById("end-screen");
+let finalScore = document.getElementById("final-score");
+let startBtn = document.getElementById("start");
+let submitBtn = document.getElementById("submit");
+let initialsInput = document.getElementById("initials");
+
+
 
 const questions = [
   {
@@ -38,18 +47,16 @@ let timer;
 let score = 0;
 let timeLeft = 60;
 
+// calls the page to load
+// init();
+document.addEventListener("DOMContentLoaded", init);
 
-// start button click event
-document.getElementById("start").addEventListener("click", startQuiz);
 
-// submit button click event
-document.getElementById("submit").addEventListener("click", submitScore);
+function init() {
+  // start button click event
+}
 
-// // call the function to shuffle the questions order
-// document.getElementById("start").addEventListener("click", () => {
-//   shuffleQuestions();
-//   startQuiz();
-// });
+startBtn.addEventListener('click', startQuiz); 
 
 // function to shuffle the questions order
 function shuffleQuestions() {
@@ -60,26 +67,36 @@ function shuffleQuestions() {
   return questions;
 }
 
-
 // function to start the quiz
 function startQuiz() {
-  document.getElementById("start-screen").classList.add("hide");
-
+  startScreen.classList.add("hide");
+  
   shuffleQuestions(questions);
 
-  document.getElementById("questions").classList.remove("hide");
-
+  questionsContainer.classList.remove("hide");
+  
   displayQuestion(); //first question appears
   startTimer(); // Timer starts
+}
+
+// function to start the timer
+function startTimer() {
+  timer = setInterval(function () {
+    timeLeft--;
+    document.getElementById("time").textContent = timeLeft;
+
+    if (timeLeft <= 0) {
+      endQuiz();
+    }
+  }, 1000);
 }
 
 // function to display a question
 function displayQuestion() {
   const currentQuestion = questions[currentQuestionIndex];
 
-  document.getElementById("question-title").textContent = currentQuestion.question;
+  questionTitle.textContent = currentQuestion.question;
 
-  const choicesContainer = document.getElementById("choices");
   choicesContainer.innerHTML = "";
 
   currentQuestion.choices.forEach((choice) => {
@@ -113,58 +130,28 @@ function checkAnswer(event) {
   }
 }
 
-// function to start the timer
-function startTimer() {
-  timer = setInterval(function () {
-    timeLeft--;
-    document.getElementById("time").textContent = timeLeft;
-
-    if (timeLeft <= 0) {
-      endQuiz();
-    }
-  }, 1000);
-}
-
 // function to end the quiz
 function endQuiz() {
   clearInterval(timer);
 
-  document.getElementById("questions").classList.add("hide");
-  document.getElementById("end-screen").classList.remove("hide");
-  document.getElementById("final-score").textContent = timeLeft;
+  questionsContainer.classList.add("hide");
+  endScreen.classList.remove("hide");
+  finalScore.textContent = timeLeft;
+
 }
 
-// function to submit the score
-function submitScore() {
-  const initials = document.getElementById("initials").value;
-  const score = timeLeft;
-
-  // check if localStorage is supported
-  if (typeof Storage !== "undefined") {
-    // retrieve existing high scores or initialize an empty array
-    const highScores = JSON.parse(localStorage.getItem("highScores")) || [];
-
-    // add the current score to the array
-    highScores.push({ initials, score });
-
-    // sort the high scores in descending order
-    highScores.sort((a, b) => b.score - a.score);
-
-    // storage the updated high scores in localStorage
-    localStorage.setItem("highScores", JSON.stringify(highScores));
-  } else {
-    // if localStorage is not supported, warn the user
-    console.error("LocalStorage is not supported. Unable to save your high scores.");
+submitBtn.addEventListener('click', () => {
+  const initials = initialsInput.value.trim();
+  const scoreData = {
+    initials: initials,
+    score: timeLeft
   }
 
-  // redirect to highscores page
-  window.location.href = "highscores.html";
+  let highScores = JSON.parse(localStorage.getItem("highScores")) || [];
+  highScores.push(scoreData);
+  highScores.sort((a, b) => b.score - a.score);
+  localStorage.setItem('highScores', JSON.stringify(highScores));
+  window.location.href = 'highscores.html';
+})
 
-}
-
-
-// User submits form
-  // Initials and score get stored in local storage
-  // User is taken to the high scores page
-  // High scores are listed, sorted highest to lowest
-  // User has option to take the quiz again
+});
